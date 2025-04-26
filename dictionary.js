@@ -3,7 +3,7 @@ import axios from "axios";
 
 export default function App() {
   const [keyword, setKeyword] = useState("");
-  const [phonetic, setPhonetic] = useState("");
+  const [photos, setPhotos] = useState([]);
 
   function handleInputChange(event) {
     setKeyword(event.target.value);
@@ -11,31 +11,27 @@ export default function App() {
 
   function handleFormSubmit(event) {
     event.preventDefault();
-    searchPhonetic();
+    searchPhotos();
   }
 
-  function searchPhonetic() {
+  function searchPhotos() {
     const apiKey = "33ac5e9b0eacbo082t8a473ffd2045d0";
     const apiUrl = `https://api.shecodes.io/dictionary/v1/define?word=${keyword}&key=${apiKey}`;
 
     axios.get(apiUrl).then((response) => {
-      if (
-        response.data &&
-        response.data.phonetics &&
-        response.data.phonetics.length > 0
-      ) {
-        setPhonetic(response.data.phonetics[0].text);
+      if (response.data && response.data.photos && response.data.photos.length > 0) {
+        setPhotos(response.data.photos);
       } else {
-        setPhonetic("Phonetic not found.");
+        setPhotos([]);
       }
     }).catch((error) => {
-      setPhonetic("Error retrieving phonetic.");
+      setPhotos([]);
     });
   }
 
   return (
     <div className="App" style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Phonetics Finder 🔤</h1>
+      <h1>Dictionary with Photos 📷</h1>
       <form onSubmit={handleFormSubmit}>
         <input
           type="text"
@@ -52,10 +48,24 @@ export default function App() {
         </button>
       </form>
 
-      {phonetic && (
-        <div style={{ marginTop: "30px", padding: "20px" }}>
-          <h2>Phonetic for "{keyword}":</h2>
-          <p style={{ fontSize: "24px", fontWeight: "bold" }}>{phonetic}</p>
+      {photos.length > 0 && (
+        <div
+          style={{
+            marginTop: "30px",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: "10px"
+          }}
+        >
+          {photos.map((photo, index) => (
+            <img
+              key={index}
+              src={photo.src.landscape}
+              alt={keyword}
+              style={{ width: "150px", borderRadius: "8px" }}
+            />
+          ))}
         </div>
       )}
     </div>
